@@ -38,7 +38,13 @@
 
 ## “Do you use AI to develop this project?”
 > I do not vibe code, do not share designs or ideas, nor do I theory-craft with AI at all. It's not part of my "creative process", whenever I use AI it's only Gemini while using extreme caution and actually reading the sources.
-> If anything is going to take the credit for this project, then it should be my unwavering autism, not Gemini.
+> If anything is going to take the credit for this project, then it should be my unwavering autism.
+ 
+> I am aware that learning to use Claude or other highly intelligent agents is an insanely recommended skill to save time.
+> Infact, I would even agree with you this project would be finished faster and probably better if I swallowed my pride on this, however I won't. I wouldn't have fun.
+ 
+> I'm keeping this AI-slop free and turning away anyone wishing to contribute Claude or other Agent-adjacent code.
+
 
 ## “Can I help with this project?”
 > I’m open to any criticism, you may ask me questions and provide help in the project thread, and of course let me know about any mistakes you find anywhere.
