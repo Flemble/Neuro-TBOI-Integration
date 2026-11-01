@@ -8,9 +8,9 @@
 
 ## A Neuro-sama Integration that allows her to play The binding of Isaac: Repentance+
 
-This project uses repentogon's "luadebug" feature to give an Isaac mod full access to the lua standard library, this is in order to send game data that the mod "scrapes" directly over to the main C++ program. 
+This project uses repentogon's "luadebug" feature to give an Isaac mod full access to the lua standard library, this is in order to send game data that the mod "scrapes" directly over to the main C++ program.
 
-All of this is done through the neuro-sdk-websocket.
+The mod directly writes to "Mod_data.json" which the program is reading for any changes, changes are taken into memory when verified.
 
 > [!WARNING]
 > The "luadebug" feature is dangerous, and appropriate measures to address and prevent problems will be in the installation instructions when we get there.

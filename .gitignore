@@ -72,3 +72,4 @@ cmake-build-debug/
 .idea/
 neuro-integration-mod/.vscode/
 neuro-integration-mod/.luarc.json
+neuro-integration-mod/dkjson.lua
