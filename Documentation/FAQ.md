@@ -43,7 +43,7 @@
 > I am aware that learning to use Claude or other intelligent agents is an insanely recommended skill to save time.
 > In fact, I will even agree. This project would be finished faster and probably better if I swallowed my pride on this, however I won't.
 
-> [!WARNING]
+> [!CAUTION]
 > I will be turning away anyone wishing to contribute Claude or other Agent-adjacent code.
 
 
