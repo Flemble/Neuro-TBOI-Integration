@@ -1,7 +1,7 @@
 # Neuro-TBOI-Integration
 
 > [!WARNING]
-> The [Basics.md](https://github.com/Flemble/Neuro-TBOI-Integration/blob/main/Documentation/Basics.md#if-you-see-any-mistakes-or-inaccuracies-within-this-documentation-please-report-it-to-the-discord-project-thread) documentation may contain SPOILERS for "The binding of Isaac: Repentance+" be warned! 
+> The documentation may contain SPOILERS for "The binding of Isaac: Repentance+" be warned! 
 
 > [!IMPORTANT]
 > This project currently contains unfinished coding, missing dependencies, and is majorly untestable. Please only look through and test things **at your own discretion**. When the build is more feature-rich and stable, this message will be removed.

@@ -34,14 +34,19 @@
 > Apart from that, there are no plans to add any extra mods, especially not ones that may add even more instability to the game. 
 
 ## "Will there be support for multiplayer?"
-> Mods are completely disabled for online play with no intent from Nicalis to allow them, I do not see it being possible.
+> The idea is not a fun one, the answer is likely no. while local multiplayer is not impossible, 
+> it does add a lot of variables that are extremely difficult to account for, the possibility will be explored again much later in development.
+ 
+> Since there needs to be support for complex characters like Jacob & Esau, 
+> multiplayer may already end up so semi-supported that actually implementing it won't be so difficult. Again, no promises.
 
 ## “Do you use AI to develop this project?”
-> I do not vibe code, do not share designs or ideas, nor do I theory-craft with AI at all. It's not part of my "creative process", whenever I use AI it's only Gemini while using extreme caution and actually reading the sources.
-> If anything is going to take the credit for this project, then it should be my unwavering autism.
+> I do not vibe code, share designs or ideas, nor do I theory-craft with AI at all. It ruins the fun and creativity of coding
+> for me. I still recognize it as a powerful and helpful tool for debugging and menial questions, 
+> so I will still use it for such things when deemed appropriate. However, I do not wish to ever learn how to use Claude or anything like that.
  
-> I am aware that learning to use Claude or other intelligent agents is an insanely recommended skill to save time.
-> In fact, I will even agree. This project would be finished faster and probably better if I swallowed my pride on this, however I won't.
+> I am aware that learning to use Claude or other intelligent agents is a recommended skill to save time.
+> In fact, I will even agree. This project might be finished faster and with more understanding by doing so, but I refuse, sorry.
 
 > [!CAUTION]
 > I will be turning away anyone wishing to contribute Claude or other Agent-adjacent code.
