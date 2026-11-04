@@ -10,8 +10,6 @@
 
 This project uses repentogon's "luadebug" feature to give an Isaac mod full access to the lua standard library, this is in order to send game data that the mod "scrapes" over to the main C++ program.
 
-The mod directly writes to "Mod_data.json" which the program is reading for any changes, changes are taken into memory when verified.
-
 > [!WARNING]
 > The "luadebug" feature is dangerous, appropriate measures to address and prevent problems will be in the installation instructions when we get there.
 
