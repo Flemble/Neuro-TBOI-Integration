@@ -3,32 +3,61 @@ local json = require("json")
 local socket = require("socket")
 
 -- SOCKET PROTOCOL TESTS
+Console.RegisterCommand("SockTest", "Tests the Isaac luasocket", "HelpText", true, AutocompleteType.NONE)
+Console.RegisterCommand("EchoTest", "Send test for sending and recieving a TCP echo", "HelpText", true, AutocompleteType.NONE)
 
-Console.RegisterCommand("socktest", "Tests the Isaac luasocket", "HelpText", true, AutocompleteType.NONE)
 
 function IntegrationGameData:SocketTest(cmd)
-    if cmd == "socktest" then 
+    if cmd == "SockTest" then 
         Isaac.ConsoleOutput("Testing the Isaac 'LuaSocket' protocol... ")
-    
         Isaac.ConsoleOutput("\nLuaSocket is running version > " .. socket._VERSION) 
 
-        local host = "*"
-        local port = 8080
-        local sock = assert(socket.bind(host, port))
-        local i, p = sock:getsockname()
-        assert(i, p)
+        TcpClient = assert(socket.tcp())
 
-        Isaac.ConsoleOutput("\nGiving info on current connected sockets > " .. i .. ":" .. p .. "...")
+        local success, err = TcpClient:connect("tcpbin.com", 4242) -- A TCP echo server
 
-        Isaac.ConsoleOutput("\nTests finished.")
+        if not success then
+            TcpClient:close()
+            Console.PrintError("Connection failed: " .. err) 
+            return 
+        end
+
+        Isaac.ConsoleOutput("\nEstablished a client and connected it to 'tcpbin.com'!")
+        Isaac.ConsoleOutput("\n(Client will expire in 30 seconds.)")
+        TcpClient:settimeout(30)
     else return end
 end
 
+function IntegrationGameData:EchoTest(cmd)
+    if cmd == "EchoTest" then
+        CheckConnection()
+        
+        local sent, err = TcpClient:send("This is a test.\n")
+        if not sent then Console.PrintError(err) return end
+
+        Isaac.ConsoleOutput("\nSent data, waiting for response...")
+
+        while true do
+            local received, status, partial = TcpClient:receive("*l")
+            Isaac.ConsoleOutput(received or partial)
+            if status == "closed" then break end
+        end
+   
+        Isaac.ConsoleOutput("\ntests finished.")
+    end
+end
+
+function CheckConnection()
+    if not TcpClient then
+    Console.PrintError("Couldn't find a valid connection, have you run 'SockTest'?") return end
+end
+
 IntegrationGameData:AddCallback(ModCallbacks.MC_EXECUTE_CMD, IntegrationGameData.SocketTest)
+IntegrationGameData:AddCallback(ModCallbacks.MC_EXECUTE_CMD, IntegrationGameData.EchoTest)
 
 -- Comments outside of relevant functions explain what all functions below it do until the next comment
 
-function CheckNil(data) -- May be redundant with new json that isaac uses, needs testing
+function CheckNil(data) -- May be redundant with the json that isaac uses, needs testing
     if not data then
         return json.null
     else
