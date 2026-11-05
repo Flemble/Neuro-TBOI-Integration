@@ -1,7 +1,7 @@
 # Neuro-TBOI-Integration
 
 > [!WARNING]
-> The documentation may contain SPOILERS for "The binding of Isaac: Repentance+" be warned! 
+> The documentation may contain SPOILERS for "The Binding of Isaac: Repentance+" be warned! 
 
 > [!IMPORTANT]
 > This project currently contains unfinished coding, missing dependencies, and is majorly untestable. Please only look through and test things **at your own discretion**. When the build is more feature-rich and stable, this message will be removed.
@@ -17,7 +17,7 @@ Another thing that needs to be addressed is Neuro not knowing what items do. Luc
 
 After data is processed and validated by the "integration" it finally makes its way to Neuro if it needs to, otherwise it's stored inside memory to be given whenever needed.
 
-As the binding of Isaac is a game about Items, Information and synergies, this is actually *most* of the game covered! and it will remain a large majority of my focus on this project until I can't avoid the inevitable next feature anymore...
+As The Binding of Isaac is a game about Items, Information and synergies, this is actually *most* of the game covered! and it will remain a large majority of my focus on this project until I can't avoid the inevitable next feature anymore...
 ## Dodging, Movement and game interaction:
 
 Currently, everything previously mentioned has been well-thought-out and I have confirmed it's possible, the difficult part comes with the integration's "dodging" feature (also movement and other things)

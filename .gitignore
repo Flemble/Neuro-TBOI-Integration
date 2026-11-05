@@ -70,6 +70,5 @@ Testing/
 include/
 cmake-build-debug/
 .idea/
-neuro-integration-mod/.vscode/
-neuro-integration-mod/.luarc.json
-neuro-integration-mod/dkjson.lua
+neuro-integration-mod/
+!neuro-integration-mod/main.lua
