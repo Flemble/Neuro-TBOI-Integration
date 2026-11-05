@@ -7,5 +7,3 @@
 [websocketpp](https://github.com/zaphoyd/websocketpp/) - by "zaphoyd"
 
 [json](https://github.com/nlohmann/json) - by "nlohmann"
-
-[dkjson](https://dkolf.de/dkjson-lua/) - by "David Kolf"
