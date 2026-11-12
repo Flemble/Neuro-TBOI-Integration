@@ -70,43 +70,57 @@ Console.RegisterCommand("ping", "ping the server, times out after 2 seconds", "H
 IntegrationGameData:AddCallback(ModCallbacks.MC_EXECUTE_CMD, IntegrationGameData.Connect)
 IntegrationGameData:AddCallback(ModCallbacks.MC_EXECUTE_CMD, IntegrationGameData.ping)
 
--- May be redundant with the json that isaac uses, needs testing
-function CheckNil(data) 
-    if not data then
-        return json.null
-    else
-        return data
-    end
-end
-
-
 -- Data needs to be sent over UDP 
 function DumpData(data) -- [[ NEEDS TO BE IMMUNE TO SPAMMING AND RACE CONDITIONS ]] we'll get there eventually.
-
+    Isaac.ConsoleOutput(data)
 end
 
 -- Dumps pickups data (includes hearts, coins, bombs, keys, pills, cards/runes, trinkets)
 function IntegrationGameData:DumpPickupsData() -- Figure out how to deny this function if you are just COLLIDING with a pickup
-    Isaac.ConsoleOutput("neuro-integration: Getting pickups data...")
+    Isaac.ConsoleOutput("neuro-integration: getting pickups data...")
     local player = Isaac.GetPlayer(0)
 
-    local HitPoints = CheckNil(player:GetHearts() + player:GetSoulHearts() + player:GetEternalHearts() + player:GetBoneHearts() + player:GetRottenHearts())
-    local C = CheckNil(player:GetNumCoins())
-    local B = CheckNil(player:GetNumBombs())
-    local K = CheckNil(player:GetNumKeys())
-    local HGB = CheckNil(player:HasGoldenBomb())
-    local HGK = CheckNil(player:HasGoldenKey())
+    local HitPoints = player:GetHearts() + player:GetSoulHearts() + player:GetEternalHearts() + player:GetBoneHearts() + player:GetRottenHearts()
+    local C = player:GetNumCoins()
+    local B = player:GetNumBombs()
+    local K = player:GetNumKeys()
+    local HGB = player:HasGoldenBomb()
+    local HGK = player:HasGoldenKey()
 
     local Pickups = json.encode{HP = HitPoints, Coins = C, Bombs = B, Keys = K, GoldenBomb = HGB, GoldenKey = HGK}
     DumpData(Pickups)
 end
 
+function IntegrationGameData:DumpConsumableData(_IntegrationGameData)
+    Isaac.ConsoleOutput("neuro-integration: getting consumables data...")
+    local player = Isaac.GetPlayer(0)
 
-function IntegrationGameData:DumpConsumables(_IntegrationGameData)
-    local Identifier = "Consumables"
+    local PrimaryPocket = player:GetPocketItem(PillCardSlot.PRIMARY)
+    local SecondaryPocket = player:GetPocketItem(PillCardSlot.SECONDARY)
+
+    if PrimaryPocket:GetType() == PocketItemType.CARD then
+        local PrimaryIdentifyItemID = player:GetCard(PrimaryPocket:GetSlot())
+        AssignedPrimaryPocket = Isaac.GetItemConfig():GetCard(PrimaryIdentifyItemID)
+    end
+
+    if SecondaryPocket:GetType() == PocketItemType.CARD then
+        local SecondaryIdentifyItemID = player:GetCard(SecondaryPocket:GetSlot())
+        AssignedSecondaryPocket = Isaac.GetItemConfig():GetCard(SecondaryIdentifyItemID)
+    end
+
+    if PrimaryPocket:GetType() == PocketItemType.PILL then -- Finish later
+        
+    end
+
+    if SecondaryPocket:GetType() == PocketItemType.PILL then -- Finish later
+        
+    end
+
+    local Consumables = json.encode{PrimaryPocket = AssignedPrimaryPocket, SecondaryPocket = AssignedSecondaryPocket}
+    DumpData(Consumables)
 end
 
-function IntegrationGameData:DumpTrinkets(_IntegrationGameData)
+function IntegrationGameData:DumpTrinketsData(_IntegrationGameData)
     local Identifier = "Trinkets"
 end
 
@@ -116,6 +130,8 @@ IntegrationGameData:AddCallback(ModCallbacks.MC_POST_PICKUP_COLLISION, Integrati
 IntegrationGameData:AddCallback(ModCallbacks.MC_POST_PICKUP_COLLISION, IntegrationGameData.DumpPickupsData, PV.PICKUP_COIN) -- simplify this somehow
 IntegrationGameData:AddCallback(ModCallbacks.MC_POST_PICKUP_COLLISION, IntegrationGameData.DumpPickupsData, PV.PICKUP_KEY)
 IntegrationGameData:AddCallback(ModCallbacks.MC_POST_PICKUP_COLLISION, IntegrationGameData.DumpPickupsData, PV.PICKUP_BOMB)
+IntegrationGameData:AddCallback(ModCallbacks.MC_POST_PLAYER_COLLECT_CARD, IntegrationGameData.DumpConsumableData)
+IntegrationGameData:AddCallback(ModCallbacks.MC_POST_PLAYER_COLLECT_PILL, IntegrationGameData.DumpConsumableData)
 
 
 
