@@ -4,23 +4,54 @@ local socket = require("socket")
 
 -- Comments outside of relevant functions explain what all functions below it do until the next comment
 
--- UDP SOCKET AND TESTING
+-- UDP SOCKET, INITIALIZATION AND TESTING
 function ClientSetup()
     UDPClient = assert(socket.udp())
 
-    UDPClient:settimeout(0)
+    UDPClient:settimeout(2)
     assert(UDPClient:setsockname("0.0.0.0",0))
     UDPClient:setpeername("localhost", 1987)
     Isaac.ConsoleOutput("neuro-integration: established a UDP client")
 
     local PeerListen = UDPClient:getpeername()
     Isaac.ConsoleOutput("\nlistening on peer: " .. PeerListen)
+
+    Console.PrintWarning("\nneuro-integration: pinging server...")
+end
+
+function CheckConnection()
+    if not UDPClient then
+    Console.PrintError("neuro-integration: cannot find UDP Client") return end
+end
+
+function PingServer()
+    CheckConnection()
+    local EstimateDelay = os.clock()
+    UDPClient:send("Ping!")
+
+    while true do
+        local response, err = UDPClient:receive()
+
+        if not response and err == "timeout" then
+            Console.PrintError("neuro-integration: request timeout")
+            return
+        end
+
+        if response and response:match "Pong!" then
+            local EstimateMath = math.floor(((os.clock() - EstimateDelay) * 1000) + 0.5)
+            local FinalEstimate = string.format("%s (%dms)", response, EstimateMath)
+            Isaac.ConsoleOutput("\n" ..FinalEstimate)
+
+            return
+        elseif response then
+            Console.PrintError("neuro-integration: " .. err)
+            return
+        end
+    end
 end
 
 ClientSetup()
-
-Console.RegisterCommand("EchoTest", "Test for sending an echo", "HelpText", true, AutocompleteType.NONE)
-Console.RegisterCommand("Connect", "Usually the mod connects on init, this attempts another connection", "HelpText", true, AutocompleteType.NONE)
+PingServer()
 
 function IntegrationGameData:Connect(cmd)
     if cmd == "Connect" then
@@ -28,23 +59,16 @@ function IntegrationGameData:Connect(cmd)
     end
 end
 
-function IntegrationGameData:EchoTest(cmd)
-    if cmd == "EchoTest" then
-        CheckConnection()
-
-        UDPClient:send("This is a test.")
-   
-        Isaac.ConsoleOutput("neuro-integration: test message sent, check the application.")
+function IntegrationGameData:ping(cmd)
+    if cmd == "ping" then
+        PingServer()
     end
 end
 
-function CheckConnection()
-    if not UDPClient then
-    Console.PrintError("Critical error: couldn't find a valid connection") return end
-end
-
+Console.RegisterCommand("Connect", "Usually the mod connects on init, this attempts another connection", "HelpText", true, AutocompleteType.NONE)
+Console.RegisterCommand("ping", "ping the server, times out after 2 seconds", "HelpText", true, AutocompleteType.NONE)
 IntegrationGameData:AddCallback(ModCallbacks.MC_EXECUTE_CMD, IntegrationGameData.Connect)
-IntegrationGameData:AddCallback(ModCallbacks.MC_EXECUTE_CMD, IntegrationGameData.EchoTest)
+IntegrationGameData:AddCallback(ModCallbacks.MC_EXECUTE_CMD, IntegrationGameData.ping)
 
 -- May be redundant with the json that isaac uses, needs testing
 function CheckNil(data) 
