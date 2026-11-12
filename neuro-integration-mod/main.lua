@@ -1,56 +1,53 @@
 local IntegrationGameData = RegisterMod("IntegrationGameData", 1)
 local json = require("json")
-local websocket = require("http.websocket")
-local ws = websocket.new_from_uri("ws://127.0.0.1:9002")
+local socket = require("socket")
 
--- SOCKET PROTOCOL TESTS
-Console.RegisterCommand("Connect", "Connects to websocket", "HelpText", true, AutocompleteType.NONE)
-Console.RegisterCommand("EchoTest", "Send test for sending and recieving a TCP echo", "HelpText", true, AutocompleteType.NONE)
+-- Comments outside of relevant functions explain what all functions below it do until the next comment
 
+-- UDP SOCKET AND TESTING
+function ClientSetup()
+    UDPClient = assert(socket.udp())
 
-function IntegrationGameData:SocketTest(cmd)
-    if cmd == "SockTest" then 
-        Isaac.ConsoleOutput("Connecting to the Integration websocket...")
+    UDPClient:settimeout(0)
+    assert(UDPClient:setsockname("0.0.0.0",0))
+    UDPClient:setpeername("localhost", 1987)
+    Isaac.ConsoleOutput("neuro-integration: established a UDP client")
 
-        local success, err = assert(ws:connect()) -- A TCP echo server
+    local PeerListen = UDPClient:getpeername()
+    Isaac.ConsoleOutput("\nlistening on peer: " .. PeerListen)
+end
 
-        if not success then
-            assert(ws:close())
-            Console.PrintError("Connection failed: " .. err) 
-            return 
-        end
+ClientSetup()
 
-        Isaac.ConsoleOutput("\nEstablished a client and connected to websocket!")
-    else return end
+Console.RegisterCommand("EchoTest", "Test for sending an echo", "HelpText", true, AutocompleteType.NONE)
+Console.RegisterCommand("Connect", "Usually the mod connects on init, this attempts another connection", "HelpText", true, AutocompleteType.NONE)
+
+function IntegrationGameData:Connect(cmd)
+    if cmd == "Connect" then
+        ClientSetup()
+    end
 end
 
 function IntegrationGameData:EchoTest(cmd)
     if cmd == "EchoTest" then
         CheckConnection()
-        
-        local sent, err = assert(ws:send("Testing the websocket!"))
-        if not sent then Console.PrintError(err) return end
 
-        Isaac.ConsoleOutput("\nSent data, waiting for response...")
-
-        local data = assert(ws:receive())
-        
-        Isaac.ConsoleOutput("\nRecieved data: " .. data)
+        UDPClient:send("This is a test.")
    
-        Isaac.ConsoleOutput("\ntests finished.")
+        Isaac.ConsoleOutput("neuro-integration: test message sent, check the application.")
     end
 end
 
-function CheckConnection() -- empty for now
-
+function CheckConnection()
+    if not UDPClient then
+    Console.PrintError("Critical error: couldn't find a valid connection") return end
 end
 
-IntegrationGameData:AddCallback(ModCallbacks.MC_EXECUTE_CMD, IntegrationGameData.SocketTest)
+IntegrationGameData:AddCallback(ModCallbacks.MC_EXECUTE_CMD, IntegrationGameData.Connect)
 IntegrationGameData:AddCallback(ModCallbacks.MC_EXECUTE_CMD, IntegrationGameData.EchoTest)
 
--- Comments outside of relevant functions explain what all functions below it do until the next comment
-
-function CheckNil(data) -- May be redundant with the json that isaac uses, needs testing
+-- May be redundant with the json that isaac uses, needs testing
+function CheckNil(data) 
     if not data then
         return json.null
     else
@@ -59,7 +56,7 @@ function CheckNil(data) -- May be redundant with the json that isaac uses, needs
 end
 
 
--- Data needs to be sent over a websocket
+-- Data needs to be sent over UDP 
 function DumpData(data) -- [[ NEEDS TO BE IMMUNE TO SPAMMING AND RACE CONDITIONS ]] we'll get there eventually.
 
 end
