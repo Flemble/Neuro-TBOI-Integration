@@ -21,11 +21,12 @@ end
 
 function CheckConnection()
     if not UDPClient then
-    Console.PrintError("neuro-integration: cannot find UDP Client") return end
+    Console.PrintError("\nneuro-integration: cannot find UDP Client") return "failure" end
 end
 
 function PingServer()
-    CheckConnection()
+    if CheckConnection() == "failure" then return end
+
     local EstimateDelay = os.clock()
     UDPClient:send("Ping!")
 
@@ -72,11 +73,23 @@ IntegrationGameData:AddCallback(ModCallbacks.MC_EXECUTE_CMD, IntegrationGameData
 
 -- Data needs to be sent over UDP 
 function DumpData(data) -- [[ NEEDS TO BE IMMUNE TO SPAMMING AND RACE CONDITIONS ]] we'll get there eventually.
-    Isaac.ConsoleOutput(data)
+    Isaac.ConsoleOutput("\n" ..data)
 end
 
 -- Dumps pickups data (includes hearts, coins, bombs, keys, pills, cards/runes, trinkets)
-function IntegrationGameData:DumpPickupsData() -- Figure out how to deny this function if you are just COLLIDING with a pickup
+function VerifyPickups(pickup)
+    local PV = pickup.Variant
+    if PV ~= 10 and PV ~= 20 and PV ~= 30 and PV ~= 40 then return "failure" end
+
+    if pickup:GetSprite():IsPlaying("Collect") then
+        return
+    else
+        return "failure"
+    end
+end
+
+function IntegrationGameData:DumpPickupsData(pickup)
+    if VerifyPickups(pickup) == "failure" then return end
     Isaac.ConsoleOutput("neuro-integration: getting pickups data...")
     local player = Isaac.GetPlayer(0)
 
@@ -91,47 +104,31 @@ function IntegrationGameData:DumpPickupsData() -- Figure out how to deny this fu
     DumpData(Pickups)
 end
 
-function IntegrationGameData:DumpConsumableData(_IntegrationGameData)
-    Isaac.ConsoleOutput("neuro-integration: getting consumables data...")
+function IntegrationGameData:DumpCardData(_IntegrationGameData)
+    Isaac.ConsoleOutput("neuro-integration: getting card data...")
     local player = Isaac.GetPlayer(0)
 
-    local PrimaryPocket = player:GetPocketItem(PillCardSlot.PRIMARY)
-    local SecondaryPocket = player:GetPocketItem(PillCardSlot.SECONDARY)
+    local PrimaryPocket = player:GetPocketItem(PillCardSlot.PRIMARY):GetSlot()
 
-    if PrimaryPocket:GetType() == PocketItemType.CARD then
-        local PrimaryIdentifyItemID = player:GetCard(PrimaryPocket:GetSlot())
-        AssignedPrimaryPocket = Isaac.GetItemConfig():GetCard(PrimaryIdentifyItemID)
-    end
+    local AssignedPrimaryPocket = Isaac.GetItemConfig():GetCard(PrimaryPocket)
 
-    if SecondaryPocket:GetType() == PocketItemType.CARD then
-        local SecondaryIdentifyItemID = player:GetCard(SecondaryPocket:GetSlot())
-        AssignedSecondaryPocket = Isaac.GetItemConfig():GetCard(SecondaryIdentifyItemID)
-    end
-
-    if PrimaryPocket:GetType() == PocketItemType.PILL then -- Finish later
-        
-    end
-
-    if SecondaryPocket:GetType() == PocketItemType.PILL then -- Finish later
-        
-    end
-
-    local Consumables = json.encode{PrimaryPocket = AssignedPrimaryPocket, SecondaryPocket = AssignedSecondaryPocket}
+    local Consumables = json.encode{PrimaryPocket = AssignedPrimaryPocket.Name}
     DumpData(Consumables)
+end
+
+function IntegrationGameData:DumpPillData(_IntegrationGameData)
+    local Identifier = "Pills"
 end
 
 function IntegrationGameData:DumpTrinketsData(_IntegrationGameData)
     local Identifier = "Trinkets"
 end
 
--- adds callbacks for picking up items to dump their respective data [[ BUG WITH COLLIDING BUT NOT COLLECTING, NEEDS CUSTOM CALLBACK OR WAY TO VERIFY PICKUPVARIANT IN FUNCTION ]]
-local PV = PickupVariant
-IntegrationGameData:AddCallback(ModCallbacks.MC_POST_PICKUP_COLLISION, IntegrationGameData.DumpPickupsData, PV.PICKUP_HEART) -- MAKE THIS FUNCTION ONLY PASS WHEN PICKING UP VALID PICKUPS
-IntegrationGameData:AddCallback(ModCallbacks.MC_POST_PICKUP_COLLISION, IntegrationGameData.DumpPickupsData, PV.PICKUP_COIN) -- simplify this somehow
-IntegrationGameData:AddCallback(ModCallbacks.MC_POST_PICKUP_COLLISION, IntegrationGameData.DumpPickupsData, PV.PICKUP_KEY)
-IntegrationGameData:AddCallback(ModCallbacks.MC_POST_PICKUP_COLLISION, IntegrationGameData.DumpPickupsData, PV.PICKUP_BOMB)
-IntegrationGameData:AddCallback(ModCallbacks.MC_POST_PLAYER_COLLECT_CARD, IntegrationGameData.DumpConsumableData)
-IntegrationGameData:AddCallback(ModCallbacks.MC_POST_PLAYER_COLLECT_PILL, IntegrationGameData.DumpConsumableData)
+-- adds callbacks for picking up items to dump their respective data
+
+IntegrationGameData:AddCallback(ModCallbacks.MC_POST_PICKUP_COLLISION, IntegrationGameData.DumpPickupsData)
+IntegrationGameData:AddCallback(ModCallbacks.MC_POST_PLAYER_COLLECT_CARD, IntegrationGameData.DumpCardData)
+IntegrationGameData:AddCallback(ModCallbacks.MC_POST_PLAYER_COLLECT_PILL, IntegrationGameData.DumpPillData)
 
 
 
